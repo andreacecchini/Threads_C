@@ -10,5 +10,107 @@
 \begin{document}
     % Let visualize the title on the first page
     \maketitle
-    \section{Introduzione}
+    % Introduction
+    \section{Thread}
+    % DEFINITION: Thread 
+    Un \textbf{Thread} e' un componente di un processo che astrae
+    il concetto di \textbf{flusso di istruzioni} che lo scheduler puo'
+    far eseguire separatamente o \textbf{concorrentemente} con il resto
+    del processo.
+    \\ 
+    Piu' banalmente possiamo pensare ad un Thread come ad una procedura
+    che lavora in parallelo con le altre procedure del processo.
+    
+    % Strutture dati di un thread e condivisione della memoria
+    \subsection{Contesto di un thread e condivisione della memoria}
+    Un Thread per poter svolgere il suo lavoro si munisce di proprie 
+    strutture dati.
+    \\
+    In particolare un thread ha un proprio \textbf{contesto}:
+    \begin{itemize}
+        \item Process ID
+        \item Program Counter
+        \item Stato dei registri
+        \item \textbf{Stack di memoria}
+        \item \dots
+    \end{itemize} 
+    Tuttavia i thread \textbf{condividono} alcune parti del proprio
+    contesto, come:
+    \begin{itemize}
+        \item Zona Codice della memoria dedicata al processo
+        \item Zona Data della memoria dedicata al processo nel quale e' 
+        possibile accedere a variabili globali in maniera condivisa.
+        \item Tabella dei File Descriptors
+    \end{itemize}
+    In questa maniera, oltre a condividere la CPU, ogni thread puo'
+    accedere a tutte le variabili globali di un processo e anche alla
+    tabella dei file descriptors.
+
+    % Gestione dello scheduler di un thread 
+    \subsection{Cambio di contesto e Scheduler}
+    Ruolo centrale nella gestione dei thread viene svolta dallo
+    \textbf{Scheduler}.
+    Quello che fa non e' tanto diverso dalla suddivisione del tempo di 
+    utilizzo della CPU con i processi, andiamo quindi ad estendere il
+    concetto.
+    Lo Scheduler affida per un certo \( \Delta t \) di tempo la CPU
+    ad un \textbf{thread di un processo}.
+    Successivamente lo scheduler potra' decidere di affidare la CPU
+    ad un thread di un altro proceso o \textbf{dello stesso processo}.
+    \\
+    Questo fatto porta a delle considerazioni da fare.
+    \\
+    Il cambio di contesto tra threads dello stesso processo \textbf{e'
+    molto piu' veloce} del cambio di contesto da parte di thread 
+    appartenti a processi diversi.
+    \\
+    Questo fatto e' dovuto al fatto che i thread appartenti ad uno stesso
+    processo condivino parte del contesto, quindi alcune parti rimaranno
+    inalterate nella fase di switching.
+    % Vantaggi/svantaggi dell'utilizzo dei thread al posto dei processi
+    \subsection{Vantaggi/Svantaggio Thread vs Processi}
+    Esploriamo i \textbf{vantaggi} nell'utilizzo di piu' thread
+    anziche utilizzare piu' processi:
+    \begin{itemize}
+       \item Visibilita' dei dati globali
+       \item Piu' flussi di esecuzione  
+       \item Comunicazioni veloci, infatti ogni thread condivide lo 
+        stesso spazio di indirizzamento, quindi le comuinicazioni fra i
+        thread sono piu' veloci rispetto alle comuinicazioni fra i processi.
+       \item Facilita' nella gestione degli eventi asincroni
+       \item Context Swithing veloce 
+    \end{itemize}
+    Il fatto e' che alcuni vantaggi possono essere visti come dei \textbf{svantaggi}:
+    \begin{itemize}
+       \item Non si parla di parallelismo ma di \textbf{concorrenza},
+        in quanto bisogna gestire il problema delle \textbf{mutua 
+        esclusione} dei thread verso ai dati condivisi.
+    \end{itemize}
+    \textbf{ATTENZIONE!}, non si parla solamente di mutua esclusione dei
+    dati globali di un processo, la concorrenza deve essere gestita da:
+    \begin{itemize}
+       \item Dai programmatori che scrivono il programma 
+       \item Dal \textbf{Sistema Operativo} che deve implementare le 
+        funzioni di libreria e le system calls in maniera \textbf{thread safe}.
+    \end{itemize}
+    Per introdurre il concetto di \textbf{rientranza e thread safe call},
+    bisogna definire il significato di \textbf{operazione atomica}.
+    % Atomicità delle operazioni
+    \subsection{Atomicita' delle operazioni}
+        % DEFINIZIONE: Operazione atomica
+        In generale, un'operazione si dice \textbf{atomica} se risulta
+        essere \textbf{indivisibile}, ovvero che un'altra operazione
+        che utilizza dei dati condivisi con essa non puo' iniziare prima
+        che sia finita la prima.
+        In altre parole non si puo' utilizzare la caratteristica dell'
+        \textbf{interleaving} che mette a disposizione la CPU.
+        Una conseguenza di questo fatto e' che \textbf{a parita' di condizioni iniali, un'operazione atomica portera' al medesimo
+        output}.
+        Parlando pero' di operazioni che accedono alla memoria e che 
+        potrebbero invocare lo \textbf{swapping} e il \textbf{page fault}
+        dobbiamo estendere il significato:
+        \\
+        \textbf{Un'operazione si dice atomica se a parita' di input otteniamo lo stesso output}.        
+        \\
+        Questo comporta che un'operazione atomica puo' essere interotta per eseguirne un'altra piu' importante, per poi essere \textbf{richiamata e startata dall'inizio}, magari con un cambio di input iniziale.
 \end{document}
