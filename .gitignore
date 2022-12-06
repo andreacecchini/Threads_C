@@ -1,0 +1,6 @@
+# Ignoring all the latex processed file 
+*.aux
+*.fdb_latexkm
+*.fls
+*.log
+*.synctex.gz
