@@ -170,4 +170,95 @@
                 virtuale e riguardate il problem del \textbf{page fault},
                 il quale richiede di ricominciare l'operazione.
             \end{itemize}
+            Un'istruzione molto particolare che risulta essere atomica
+            viene fornita dal livello ISA dei processori INTEL x86: \textbf{compare-exchange}.
+            accompagnata dall'attributo \textbf{lock}.
+            \\
+            \begin{minted}{gas}
+    lock cpmxchg primo_argomento secondo_argomento // compare-exchange instruction 
+            \end{minted}
+            \textbf{Il primo argomento} e' una \textbf{l'indirizzo di una variabile intera},
+            mentre il \textbf{secondo} e' il nome del registro in cui e' contenuto
+            il valore da assegnare alla variabile.
+            \\
+            Vi e' un terzo argomento, implicito, che e' il contenuto del registro \textbf{EAX},
+            nel quale vi e' il valore con cui confrontare il primo argomento.
+            \\
+            Atomicamente, se la variabile intera ha il valore cercato allora lo 
+            si assegna con il nuovo valore, altrimenti la variabile intera non
+            viene modificata.
+\newpage
+            \begin{minted}{c}
+    while(1)
+    {
+        if(occupato = 0)
+        {
+            occupato = 1;
+            /* Esegi poi operazioni atomiche */
+            break;
+        }
+    }
+            \end{minted}
+            Questo codice non risulta essere atomico in quanto 
+            l'operazione di controllo e assegnazione di \textbf{occupato}
+            non e' atomica.
+            Dovremo quindi utilizzare delle \textbf{API} fornite 
+            dal sistema operativo che permettono di eseguire la \textbf{Compare-Exchange}.
+    \subsection{System call}
+    Le prime versioni di LINUX non implementavano il concetto
+    di thread, ma ne simulavano il comportamento allocando 
+    invece dei processi.
+    Lo standard POSIX si adeguo' a questo stardand creando
+    una serie di systemcall non atomiche, che d'ora in poi chiameremo
+    \textbf{NON RIENTRANTI} o \textbf{NON THREAD SAFE}.
+    \begin{minted}{c}
+    /*
+     * Questa funzione permette di ottenere la stringa codificata
+     * in ASCII partendo dalla rappresentazione dell'indirizzo IP
+     * in memoria, il quale e' un uint32_t. 
+     * Questa funzione e' NON RIENTRANTE in quanto salva il risultato
+     * della traduzione in una variabile globale il cui indirizzo 
+     * viene restituito per ogni chiamante, quindi ai diversi thread.
+     */
+    char* inet_ntoa()
+                
+    \end{minted}
+    Le implementazioni future derivate dallo \textbf{STANDARD POSIX} 
+    offrono un'implentazione \textbf{Thread Safe} per la maggior parte
+    delle syscall.
+    Per distinguere le funzioni rientranti da quelle no sono stati
+    definiti dei nuovi simboli per le chiamate a tale funzioni:
+    \begin{minted}{c}
+    /* Funzione di libreria NON RIENTRANTE */ 
+    char* strerr(int errnum); 
+    /* Funzione di libreria RIENTRANTE -- aggiunta del postfisso _r */
+    int strerr_r(int errnum, char* buf, size_T buflen);
+    \end{minted}
+\newpage
+    \subsection{POSIX Threads}
+    I thread sono stati \textbf{standardizzati}.
+    \\
+    I thread POSIX sono noti come \textbf{PThread}.
+    \\
+    Le \textbf{API} per i PThreads si distinguono in 3 parti:
+    \begin{itemize}
+       \item \textbf{Thread Managment}: funzioni per creare, eliminare 
+        attendere la fine dei pthread.
+       \item \textbf{Mutexes}: funzioni per realizzare un tipo di sincronizzazione
+       semplice chiamata "\textbf{mutex}" (mutua esclusione).
+       \item \textbf{Condition variables}: funzioni a supporto per una sincronizzazione
+       piu' complessa dipendente dal valore delle variabili.
+    \end{itemize}
+    Convenzioni sui nomi della libreria:
+    \begin{itemize}
+       \item \textbf{pthread} : gestione dei pthread in generale
+       \item \textbf{pthread\_attr\_}: funzioni per la gestione degli attributi
+       dei pthread
+       \item \textbf{pthread\_mutex\_}: gestione mutua esclusione
+    \end{itemize}
+    Il file di intestazione che contiene tali definizioni si chiama 
+    \textbf{pthread}.
+    \subsubsection{Compilazione dei programmi che utilizzano i PThread}
+
+    \subsubsection{Linking dei programmi che utilizzano i PThread}
 \end{document}
