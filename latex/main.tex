@@ -2,6 +2,7 @@
 
 % Import packages 
 \usepackage[utf8]{inputenc}
+\usepackage{minted}
 
 % Title 
 \title{Thread e programmazione Multi Threading in C}
@@ -113,4 +114,60 @@
         \textbf{Un'operazione si dice atomica se a parita' di input otteniamo lo stesso output}.        
         \\
         Questo comporta che un'operazione atomica puo' essere interotta per eseguirne un'altra piu' importante, per poi essere \textbf{richiamata e startata dall'inizio}, magari con un cambio di input iniziale.
+        \subsubsection{Le istruzioni C sono atomiche?} 
+            \textbf{NO!!} 
+            \\
+            In generale le istruzioni ad alto livello non sono mai atomiche.
+            \\
+            Nemmeno le minuscole operazioni di assegnamento di una variabile ad una costante sono atomiche:
+
+            \begin{minted}{c}
+    #define CONSTANT_VALUE 16251652
+    /* 
+     * Using a 64 unsigned integer inside a 32 bit architetture
+     */                
+    uint64_t g_var;
+
+    int main(void)
+    {
+        G = CONSTANT_VALUE
+        return (0);
+    }
+                
+            \end{minted}
+            Nella traduzione di questo sorgente C in assembly, vengono eseguite due istruzioni macchina dovute al fatto di stare processando una variabile a 64 bit in un'architettura da 32 bit.
+            \\
+            \begin{minted}{s}
+    mov DWORD PTR G, -1241209825
+    mov DWORD PTR G+4, 473 
+            \end{minted}
+
+        \newpage
+        \subsubsection{Le istruzioni in Assembly sono atomiche?}
+            \textbf{No, non tutte.}
+            \\
+            La maggioranza delle istruzioni di Assembly non sono altro che \textbf{Macro} nelle quali al suo interno vengono chiamate altre istruzioni Assembly.
+            Basti pensare all'istruzioni \textbf{call} che permette di mettere sulla cima dello stack la procedura che vogliamo eseguire.
+            \\
+            Nemmeno molte istruzioni elementari sono atomiche.
+            Un chiarissimo esempio risulta essere l'istruzione \textbf{inc}:
+            \begin{itemize}
+               \item Deve trasportare sul bus il valore dalla RAM al registro. 
+               \item Deve incrementare di un BYTE il valore del registro
+               \item Deve trasportare sul bus il valore dal registro alla RAM.
+            \end{itemize}    
+        \subsubsection{Cosa c'e' di atomico allora?}
+            Allora, cosa rimane di atomico?
+            \\
+            Alcune istruzioni di Assembly potrebbero risultare atomiche, sottostando ad alcune considerazioni.
+            \textbf{La sola copia di un dato da registro a memoria } 
+            potrebbe essere atomica se:
+            \begin{itemize}
+               \item Richiede un solo accesso al bus, vale a dire che 
+               la dimensione in bit e' adatta all'architettura della 
+               macchina.
+               \item Inoltre, si dovrebbe parlare riguardo alla memoria 
+                virtuale e riguardate il problem del \textbf{page fault},
+                il quale richiede di ricominciare l'operazione.
+            \end{itemize}
 \end{document}
