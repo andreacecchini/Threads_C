@@ -9,17 +9,47 @@
  * 
  */
 
-/*
- * We can avoid defining this symbols while adding them when compiling 
- * inside compiler options -D...
- * 
- * #define _THREAD_SAFE
- */
-
-/* INCLUDE SECTION */
+#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdint.h>
+#define N_PTHREADS 10
 
+static pthread_t threads[N_PTHREADS];
+
+/**
+ * @brief A function executed by a pthread without arguments
+ * 
+ * @return void* 
+ * 
+ */
+void* func()
+{
+    /* Do something ... */
+    fprintf(stdout, "I'm the pthread with id: %ld\n", pthread_self());
+    pthread_exit(NULL);
+}
+
+
+/**
+ * @brief A function executed by a pthread with arguments 
+ * 
+ * @param arg The data structures argument passed as argument to the function 
+ * @return void*  
+ */
+void* func_with_param(void *arg)
+{
+    int input; 
+    input = ( *(int*)arg );
+    /* Waiting the previous pthread*/
+    if(input != 0)
+    {
+        pthread_join(threads[input - 1], NULL);    
+    }
+    /* Do something ...*/
+    fprintf(stdout, "I'm the pthread called with param: %d\n", input);
+    pthread_exit(NULL);
+}
 
 /**
  * @brief Entry Point of the program 
@@ -30,8 +60,29 @@
  */
 int main(int argc, char const *argv[])
 {
-    /* [TODO] */
-    return (EXIT_SUCCESS);
+    size_t i;    
+    /* Result get by the pthreads library functions */
+    int rc;
+    int* param;
+
+    for( i = 0 ; i < N_PTHREADS ; ++i)
+    {
+        param = (int *)malloc(sizeof(int));
+        *param = i;
+        rc = pthread_create(&threads[i], NULL, func_with_param, (void *)param);
+        if( rc != 0 )
+        {
+            fprintf(stderr, "Error while creating current POSIX Thread:%ld",i);
+            exit(1);
+        }  
+    }
+    /* Killing the main thread */
+    pthread_exit(NULL);
+    /*
+     * The return istruction won't be reached because main thread will exit 
+     * before it 
+     */
+    return (EXIT_SUCCESS); 
 }
 
 

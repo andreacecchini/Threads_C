@@ -235,6 +235,10 @@
     int strerr_r(int errnum, char* buf, size_T buflen);
     \end{minted}
 \newpage
+
+    % --------------------------------------------------------------
+    % Introduzione ai POSIX THREAD
+
     \subsection{POSIX Threads}
     I thread sono stati \textbf{standardizzati}.
     \\
@@ -258,7 +262,35 @@
     \end{itemize}
     Il file di intestazione che contiene tali definizioni si chiama 
     \textbf{pthread}.
+
+    % --------------------------------------------------------------
+    % Compilazione di sorgenti utilizzanti pthreads.
+
     \subsubsection{Compilazione dei programmi che utilizzano i PThread}
+    Per compilare con successo sorgenti di codice c che includono l'header file
+    \textbf{pthread.h} bisogna definire nel sorgente i seguenti simboli:
+    \begin{itemize}
+       \item \textbf{\_THREAD\_SAFE} o \textbf{\_REENTRANT} (equivalenti),
+       questi permettono al compilatore di scegliere la versione rientrante 
+       delle funzioni di sistema se disponibili
+       \item aderire allo standard POSIX dalla versione \textbf{\_POSIX\_C\_SOURCE=1} 
+       in poi
+    \end{itemize}
+    I simboli precedentemente elencati vanno definiti prima dei vari \#include,
+    oppure possono essere definiti dal compilatore passando come argomenti al gcc
+    i simboli desiderati preceduti dal flag \textbf{-D}.
+
+    % --------------------------------------------------------------
+    % Linking di sorgenti utilizzanti pthreads.
 
     \subsubsection{Linking dei programmi che utilizzano i PThread}
+    Per \textbf{linkare} con successo un programma che utilizza pthreads e quindi
+    la libreria di sistema \textbf{libpthread.so}, bisogna aggiungere al linker i
+    seguenti flag:
+    \begin{itemize}
+        \item \textbf{-lpthread} alla fine della riga di comando 
+    \end{itemize}
+
+    % --------------------------------------------------------------
+
 \end{document}
